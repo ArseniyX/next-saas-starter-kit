@@ -1,9 +1,63 @@
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Check, Star, Users, Zap, Shield, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/theme-toggle"
+
+export const metadata: Metadata = {
+  title: "SaaSKit - Modern SaaS Starter Kit | Build Your SaaS Faster",
+  description: "Launch your SaaS application faster with our modern starter kit. Includes authentication, billing, dashboard, analytics, and more. Built with Next.js, TypeScript, and Tailwind CSS.",
+  keywords: ["SaaS", "starter kit", "Next.js", "TypeScript", "Tailwind CSS", "authentication", "billing", "dashboard", "analytics"],
+  authors: [{ name: "SaaSKit Team" }],
+  creator: "SaaSKit",
+  publisher: "SaaSKit",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://saaskit.dev",
+    title: "SaaSKit - Modern SaaS Starter Kit",
+    description: "Everything you need to launch your SaaS application. Authentication, billing, dashboard, and more - all built with modern technologies and best practices.",
+    siteName: "SaaSKit",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SaaSKit - Modern SaaS Starter Kit",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SaaSKit - Modern SaaS Starter Kit",
+    description: "Launch your SaaS application faster with our modern starter kit. Built with Next.js, TypeScript, and Tailwind CSS.",
+    images: ["/og-image.png"],
+    creator: "@saaskit",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  viewport: "width=device-width, initial-scale=1",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
+}
 
 export default function LandingPage() {
   return (
