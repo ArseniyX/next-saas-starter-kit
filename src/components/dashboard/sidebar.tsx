@@ -1,11 +1,12 @@
 "use client"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LayoutDashboard, Users, CreditCard, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
+import { signOut } from "@/lib/auth-client"
 
 const navigation = [
   {
@@ -32,7 +33,13 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/auth/signin')
+  }
 
   return (
     <div
@@ -85,10 +92,7 @@ export function Sidebar() {
             "w-full justify-start gap-3 text-muted-foreground hover:text-foreground",
             collapsed && "justify-center px-2",
           )}
-          onClick={() => {
-            // In a real app, this would handle logout
-            window.location.href = "/auth/signin"
-          }}
+          onClick={handleSignOut}
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
           {!collapsed && <span>Sign out</span>}
