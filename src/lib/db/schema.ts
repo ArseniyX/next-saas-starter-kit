@@ -125,6 +125,39 @@ export const subscriptions = sqliteTable("subscriptions", {
   }
 })
 
+// Subscription Plans
+export const plans = sqliteTable("plans", {
+  id: text("id").primaryKey().$defaultFn(() => createId()),
+  name: text("name").notNull(),
+  description: text("description"),
+  stripePriceId: text("stripe_price_id").notNull().unique(),
+  price: integer("price").notNull(), // in cents
+  currency: text("currency").notNull().default("usd"),
+  interval: text("interval", { enum: ["month", "year"] }).notNull(),
+  features: text("features").notNull(), // JSON string
+  limits: text("limits"), // JSON string for usage limits
+  active: integer("active", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+})
+
+// Payment History
+export const payments = sqliteTable("payments", {
+  id: text("id").primaryKey().$defaultFn(() => createId()),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  subscriptionId: text("subscription_id").references(() => subscriptions.id),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  amount: integer("amount").notNull(), // in cents
+  currency: text("currency").notNull().default("usd"),
+  status: text("status").notNull(),
+  invoiceUrl: text("invoice_url"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+}, (table) => {
+  return {
+    userIdIdx: index("payment_user_id_idx").on(table.userId),
+  }
+})
+
 // Usage tracking
 export const usage = sqliteTable("usage", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
@@ -153,5 +186,9 @@ export type Entity = typeof entities.$inferSelect
 export type NewEntity = typeof entities.$inferInsert
 export type Subscription = typeof subscriptions.$inferSelect
 export type NewSubscription = typeof subscriptions.$inferInsert
+export type Plan = typeof plans.$inferSelect
+export type NewPlan = typeof plans.$inferInsert
+export type Payment = typeof payments.$inferSelect
+export type NewPayment = typeof payments.$inferInsert
 export type Usage = typeof usage.$inferSelect
 export type NewUsage = typeof usage.$inferInsert

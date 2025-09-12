@@ -15,7 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CreditCard, Download, Calendar, Users, Database, Zap, Check, Crown, AlertCircle } from "lucide-react"
+import { CreditCard, Download, Calendar, Users, Database, Zap, Check, Crown, AlertCircle, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { PLANS } from "@/lib/stripe"
 
 // Mock data
 const currentPlan = {
@@ -46,37 +48,13 @@ const invoices = [
   { id: "INV-005", date: "2023-09-15", amount: 19.0, status: "paid" },
 ]
 
-const plans = [
-  {
-    name: "Starter",
-    price: 19,
-    features: ["Up to 10 users", "5GB storage", "5,000 API calls", "Email support"],
-    current: false,
-  },
-  {
-    name: "Pro",
-    price: 29,
-    features: ["Up to 25 users", "10GB storage", "10,000 API calls", "Priority support", "Advanced analytics"],
-    current: true,
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: 99,
-    features: [
-      "Unlimited users",
-      "100GB storage",
-      "Unlimited API calls",
-      "24/7 phone support",
-      "Custom integrations",
-      "SLA guarantee",
-    ],
-    current: false,
-  },
-]
+// Use the PLANS from stripe config
 
 export default function BillingPage() {
   const [showPlans, setShowPlans] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null)
+  const { toast } = useToast()
 
   const getUsagePercentage = (current: number, limit: number) => {
     return Math.min((current / limit) * 100, 100)
@@ -86,6 +64,70 @@ export default function BillingPage() {
     if (percentage >= 90) return "text-red-600"
     if (percentage >= 75) return "text-yellow-600"
     return "text-green-600"
+  }
+
+  const handleSubscribe = async (priceId: string, planSlug: string) => {
+    setProcessingPlan(planSlug)
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // TODO: Replace with actual user ID from auth
+          'x-user-id': 'user-id-here',
+        },
+        body: JSON.stringify({ priceId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session')
+      }
+
+      const { url } = await response.json()
+      
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to start checkout process',
+        variant: 'destructive',
+      })
+    } finally {
+      setProcessingPlan(null)
+    }
+  }
+
+  const handleManageBilling = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: {
+          // TODO: Replace with actual user ID from auth
+          'x-user-id': 'user-id-here',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session')
+      }
+
+      const { url } = await response.json()
+      
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to open billing portal',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -138,40 +180,51 @@ export default function BillingPage() {
                     <DialogDescription>Select the plan that best fits your needs</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 md:grid-cols-3 py-4">
-                    {plans.map((plan) => (
-                      <Card key={plan.name} className={`relative ${plan.current ? "ring-2 ring-primary" : ""}`}>
-                        {plan.popular && (
-                          <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">Most Popular</Badge>
-                        )}
-                        <CardHeader>
-                          <CardTitle className="flex items-center justify-between">
-                            {plan.name}
-                            {plan.current && <Badge variant="secondary">Current</Badge>}
-                          </CardTitle>
-                          <div className="text-3xl font-bold">
-                            ${plan.price}
-                            <span className="text-sm font-normal text-muted-foreground">/month</span>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <ul className="space-y-2">
-                            {plan.features.map((feature, index) => (
-                              <li key={index} className="flex items-center gap-2 text-sm">
-                                <Check className="h-4 w-4 text-primary" />
-                                {feature}
-                              </li>
-                            ))}
-                          </ul>
-                          <Button
-                            className="w-full mt-4"
-                            variant={plan.current ? "secondary" : "default"}
-                            disabled={plan.current}
-                          >
-                            {plan.current ? "Current Plan" : "Select Plan"}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {PLANS.map((plan) => {
+                      const isCurrent = plan.slug === 'pro' // TODO: Get from actual user subscription
+                      const isPopular = plan.slug === 'pro'
+                      
+                      return (
+                        <Card key={plan.slug} className={`relative ${isCurrent ? "ring-2 ring-primary" : ""}`}>
+                          {isPopular && (
+                            <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">Most Popular</Badge>
+                          )}
+                          <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                              {plan.name}
+                              {isCurrent && <Badge variant="secondary">Current</Badge>}
+                            </CardTitle>
+                            <div className="text-3xl font-bold">
+                              ${plan.price / 100}
+                              {plan.price > 0 && (
+                                <span className="text-sm font-normal text-muted-foreground">/month</span>
+                              )}
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {plan.features.map((feature, index) => (
+                                <li key={index} className="flex items-center gap-2 text-sm">
+                                  <Check className="h-4 w-4 text-primary" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+                            <Button
+                              className="w-full mt-4"
+                              variant={isCurrent ? "secondary" : "default"}
+                              disabled={isCurrent || processingPlan === plan.slug}
+                              onClick={() => plan.stripePriceId && handleSubscribe(plan.stripePriceId, plan.slug)}
+                            >
+                              {processingPlan === plan.slug && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              )}
+                              {isCurrent ? "Current Plan" : `Select ${plan.name}`}
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
                   </div>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setShowPlans(false)}>
@@ -180,7 +233,14 @@ export default function BillingPage() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <Button variant="outline">Cancel Subscription</Button>
+              <Button 
+                variant="outline" 
+                onClick={handleManageBilling}
+                disabled={loading}
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Manage Billing
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -275,10 +335,15 @@ export default function BillingPage() {
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 bg-transparent">
+              <Button 
+                variant="outline" 
+                className="flex-1 bg-transparent"
+                onClick={handleManageBilling}
+                disabled={loading}
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Update Payment Method
               </Button>
-              <Button variant="outline">Add Card</Button>
             </div>
           </CardContent>
         </Card>

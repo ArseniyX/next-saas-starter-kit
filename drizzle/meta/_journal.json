@@ -8,6 +8,13 @@
       "when": 1757621848938,
       "tag": "0000_yellow_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757656848360,
+      "tag": "0001_complete_katie_power",
+      "breakpoints": true
     }
   ]
 }
