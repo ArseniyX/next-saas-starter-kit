@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       phone,
       company,
       avatar,
-      createdBy: session.user.id,
+      createdBy: (session.user as any).id,
       lastLogin: null,
     }
 

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const user = await db
       .select()
       .from(users)
-      .where(eq(users.id, session.user.id))
+      .where(eq(users.id, (session.user as any).id))
       .limit(1)
 
     if (user.length === 0) {
@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest) {
     const result = await db
       .update(users)
       .set(updateData)
-      .where(eq(users.id, session.user.id))
+      .where(eq(users.id, (session.user as any).id))
       .returning()
 
     if (result.length === 0) {
