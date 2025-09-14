@@ -1,34 +1,34 @@
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core"
+import { pgTable, text, integer, timestamp, index, boolean } from "drizzle-orm/pg-core"
 import { createId } from "@paralleldrive/cuid2"
 
 // Users table
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: integer("email_verified", { mode: "timestamp" }),
+  emailVerified: timestamp("email_verified"),
   image: text("image"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  role: text("role", { enum: ["admin", "user"] }).default("user").notNull(),
-  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  role: text("role").default("user").notNull(),
+
   // Profile information
   phone: text("phone"),
   company: text("company"),
   location: text("location"),
-  
+
   // Settings
-  theme: text("theme", { enum: ["light", "dark", "system"] }).default("system"),
+  theme: text("theme").default("system"),
   language: text("language").default("en"),
   timezone: text("timezone").default("UTC"),
-  
+
   // Notifications preferences
-  emailNotifications: integer("email_notifications", { mode: "boolean" }).default(true),
-  pushNotifications: integer("push_notifications", { mode: "boolean" }).default(false),
-  securityAlerts: integer("security_alerts", { mode: "boolean" }).default(true),
-  marketingEmails: integer("marketing_emails", { mode: "boolean" }).default(false),
-  weeklyReports: integer("weekly_reports", { mode: "boolean" }).default(true),
-  billingUpdates: integer("billing_updates", { mode: "boolean" }).default(true),
+  emailNotifications: boolean("email_notifications").default(true),
+  pushNotifications: boolean("push_notifications").default(false),
+  securityAlerts: boolean("security_alerts").default(true),
+  marketingEmails: boolean("marketing_emails").default(false),
+  weeklyReports: boolean("weekly_reports").default(true),
+  billingUpdates: boolean("billing_updates").default(true),
 }, (table) => {
   return {
     emailIdx: index("email_idx").on(table.email),
@@ -36,13 +36,13 @@ export const users = sqliteTable("users", {
 })
 
 // Sessions table
-export const sessions = sqliteTable("sessions", {
+export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => {
   return {
     userIdIdx: index("session_user_id_idx").on(table.userId),
@@ -50,7 +50,7 @@ export const sessions = sqliteTable("sessions", {
 })
 
 // Accounts table (for OAuth providers)
-export const accounts = sqliteTable("accounts", {
+export const accounts = pgTable("accounts", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   accountId: text("account_id").notNull(),
@@ -58,12 +58,12 @@ export const accounts = sqliteTable("accounts", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-  accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp" }),
-  refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp" }),
+  accessTokenExpiresAt: timestamp("access_token_expires_at"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
   scope: text("scope"),
   password: text("password"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => {
   return {
     userIdIdx: index("account_user_id_idx").on(table.userId),
@@ -71,12 +71,12 @@ export const accounts = sqliteTable("accounts", {
 })
 
 // Verification tokens
-export const verificationTokens = sqliteTable("verification_tokens", {
+export const verificationTokens = pgTable("verification_tokens", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   identifier: text("identifier").notNull(),
   token: text("token").notNull(),
-  expires: integer("expires", { mode: "timestamp" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  expires: timestamp("expires").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => {
   return {
     tokenIdx: index("verification_token_idx").on(table.token),
@@ -84,18 +84,18 @@ export const verificationTokens = sqliteTable("verification_tokens", {
 })
 
 // Entities table (for the entities management feature)
-export const entities = sqliteTable("entities", {
+export const entities = pgTable("entities", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  role: text("role", { enum: ["admin", "editor", "viewer"] }).default("viewer").notNull(),
-  status: text("status", { enum: ["active", "inactive", "pending"] }).default("pending").notNull(),
+  role: text("role").default("viewer").notNull(),
+  status: text("status").default("pending").notNull(),
   avatar: text("avatar"),
   phone: text("phone"),
   company: text("company"),
-  lastLogin: integer("last_login", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdBy: text("created_by").references(() => users.id),
 }, (table) => {
   return {
@@ -105,20 +105,20 @@ export const entities = sqliteTable("entities", {
 })
 
 // Billing/subscription table
-export const subscriptions = sqliteTable("subscriptions", {
+export const subscriptions = pgTable("subscriptions", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   planName: text("plan_name").notNull(),
   planPrice: integer("plan_price").notNull(), // in cents
-  billingCycle: text("billing_cycle", { enum: ["monthly", "yearly"] }).notNull(),
-  status: text("status", { enum: ["active", "cancelled", "past_due", "trialing"] }).default("active").notNull(),
-  currentPeriodStart: integer("current_period_start", { mode: "timestamp" }).notNull(),
-  currentPeriodEnd: integer("current_period_end", { mode: "timestamp" }).notNull(),
-  cancelAtPeriodEnd: integer("cancel_at_period_end", { mode: "boolean" }).default(false),
+  billingCycle: text("billing_cycle").notNull(),
+  status: text("status").default("active").notNull(),
+  currentPeriodStart: timestamp("current_period_start").notNull(),
+  currentPeriodEnd: timestamp("current_period_end").notNull(),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => {
   return {
     userIdIdx: index("subscription_user_id_idx").on(table.userId),
@@ -126,23 +126,23 @@ export const subscriptions = sqliteTable("subscriptions", {
 })
 
 // Subscription Plans
-export const plans = sqliteTable("plans", {
+export const plans = pgTable("plans", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   name: text("name").notNull(),
   description: text("description"),
   stripePriceId: text("stripe_price_id").notNull().unique(),
   price: integer("price").notNull(), // in cents
   currency: text("currency").notNull().default("usd"),
-  interval: text("interval", { enum: ["month", "year"] }).notNull(),
+  interval: text("interval").notNull(),
   features: text("features").notNull(), // JSON string
   limits: text("limits"), // JSON string for usage limits
-  active: integer("active", { mode: "boolean" }).default(true),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 // Payment History
-export const payments = sqliteTable("payments", {
+export const payments = pgTable("payments", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   subscriptionId: text("subscription_id").references(() => subscriptions.id),
@@ -151,7 +151,7 @@ export const payments = sqliteTable("payments", {
   currency: text("currency").notNull().default("usd"),
   status: text("status").notNull(),
   invoiceUrl: text("invoice_url"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => {
   return {
     userIdIdx: index("payment_user_id_idx").on(table.userId),
@@ -159,16 +159,16 @@ export const payments = sqliteTable("payments", {
 })
 
 // Usage tracking
-export const usage = sqliteTable("usage", {
+export const usage = pgTable("usage", {
   id: text("id").primaryKey().$defaultFn(() => createId()),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   subscriptionId: text("subscription_id").references(() => subscriptions.id),
   apiCalls: integer("api_calls").default(0).notNull(),
   storage: integer("storage").default(0).notNull(), // in bytes
   users: integer("users").default(0).notNull(),
-  resetAt: integer("reset_at", { mode: "timestamp" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()).notNull(),
+  resetAt: timestamp("reset_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => {
   return {
     userIdIdx: index("usage_user_id_idx").on(table.userId),
