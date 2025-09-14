@@ -7,7 +7,7 @@ import { headers } from "next/headers"
 // Get a specific entity
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
@@ -18,10 +18,12 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     const entity = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, params.id))
+      .where(eq(entities.id, id))
       .limit(1)
 
     if (entity.length === 0) {
@@ -41,7 +43,7 @@ export async function GET(
 // Update an entity
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
@@ -52,6 +54,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
     const body = await request.json()
     const { name, email, role, status, phone, company, avatar } = body
 
@@ -59,7 +62,7 @@ export async function PUT(
     const existingEntity = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, params.id))
+      .where(eq(entities.id, id))
       .limit(1)
 
     if (existingEntity.length === 0) {
@@ -96,7 +99,7 @@ export async function PUT(
     const result = await db
       .update(entities)
       .set(updateData)
-      .where(eq(entities.id, params.id))
+      .where(eq(entities.id, id))
       .returning()
 
     return NextResponse.json(result[0])
@@ -112,7 +115,7 @@ export async function PUT(
 // Delete an entity
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
@@ -123,18 +126,20 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Check if entity exists
     const existingEntity = await db
       .select()
       .from(entities)
-      .where(eq(entities.id, params.id))
+      .where(eq(entities.id, id))
       .limit(1)
 
     if (existingEntity.length === 0) {
       return NextResponse.json({ error: "Entity not found" }, { status: 404 })
     }
 
-    await db.delete(entities).where(eq(entities.id, params.id))
+    await db.delete(entities).where(eq(entities.id, id))
 
     return NextResponse.json({ message: "Entity deleted successfully" })
   } catch (error) {
