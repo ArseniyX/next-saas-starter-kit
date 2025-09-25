@@ -19,16 +19,6 @@
 
 <br/>
 
-## 📸 Screenshots
-
-![SaaS Starter Kit Dashboard](./public/screenshot-dashboard.png)
-_Modern dashboard with dark/light mode support_
-
-![SaaS Starter Kit Landing Page](./public/screenshot-landing.png)
-_Professional landing page with responsive design_
-
-> **Note**: Add your actual screenshots to the `public` folder and update the paths above.
-
 ## 🚀 Features
 
 -   ✅ **Authentication & Authorization** - Secure user auth with Better Auth
