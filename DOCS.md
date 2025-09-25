@@ -108,5 +108,3 @@
 -   Simple search/filter for lists
 -   Notifications system (toasts + alerts)
 -   Internationalization (i18n) ready
-
-##

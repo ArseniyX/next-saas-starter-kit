@@ -1,216 +1,271 @@
 # SaaS Starter Kit
 
-A modern, production-ready SaaS starter kit built with Next.js 14, TypeScript, and shadcn/ui. Simple to maintain and packed with essential features for any SaaS application.
+<div align="center">
 
-## 🚀 Current Features
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)](https://postgresql.org/)
+[![Stripe](https://img.shields.io/badge/Stripe-Payment-635BFF?logo=stripe&logoColor=white)](https://stripe.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### ✅ Frontend & UI
+</div>
 
--   **Next.js 14** with App Router and React 19
--   **TypeScript** for type safety
--   **TailwindCSS** for styling with dark mode support
--   **shadcn/ui** component library (50+ components included)
--   **Responsive design** - works on desktop and mobile
--   **Theme toggle** - dark/light mode switching
--   **Professional dashboard layout** with sidebar and topbar navigation
+<p align="center">A modern, full-stack SaaS starter kit built with Next.js 14, TypeScript, and Tailwind CSS.<br/>Get your SaaS application up and running quickly with authentication, billing, user management, and more.</p>
 
-### ✅ Authentication (UI Only)
+<div align="center">
+  <img src="public/hero.png" alt="SaaS Starter Kit Hero" width="800" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" />
+</div>
 
--   **Sign-in/Sign-up pages** with proper form validation
--   **Password reset flow**
--   **Session management UI** (forms ready for backend integration)
--   **User profile management** interface
+<br/>
 
-### ✅ Dashboard & Analytics
+## 📸 Screenshots
 
--   **Modern dashboard** with key metrics cards
--   **Usage tracking interface** (users, storage, API calls)
--   **Recent activity feed** with status indicators
--   **Quick actions panel**
+![SaaS Starter Kit Dashboard](./public/screenshot-dashboard.png)
+_Modern dashboard with dark/light mode support_
 
-### ✅ Billing & Subscription Management
+![SaaS Starter Kit Landing Page](./public/screenshot-landing.png)
+_Professional landing page with responsive design_
 
--   **Subscription plans interface** (Free, Pro, Enterprise)
--   **Billing dashboard** with usage limits and warnings
--   **Payment method management** UI
--   **Invoice history** and download functionality
--   **Plan comparison** and upgrade flows
+> **Note**: Add your actual screenshots to the `public` folder and update the paths above.
 
-### ✅ Entity Management (CRUD)
+## 🚀 Features
 
--   **Complete entity management system** (users/team members)
--   **Advanced filtering and search**
--   **Bulk operations** and status management
--   **Modal-based editing** with form validation
--   **Table with pagination** support
+-   ✅ **Authentication & Authorization** - Secure user auth with Better Auth
+-   ✅ **Database** - PostgreSQL with Drizzle ORM and migrations
+-   ✅ **Payments & Billing** - Stripe integration with subscriptions
+-   ✅ **User Dashboard** - Complete user management interface
+-   ✅ **Entity Management** - CRUD operations for business entities
+-   ✅ **Usage Tracking** - Monitor API calls, storage, and user limits
+-   ✅ **Responsive Design** - Mobile-first with dark/light mode
+-   ✅ **Type Safety** - Full TypeScript coverage with Zod validation
+-   ✅ **Rate Limiting** - API protection with express-rate-limit
+-   ✅ **Email System** - Ready for transactional emails
+-   ✅ **Analytics Ready** - Vercel Analytics integration
+-   ✅ **Production Ready** - Optimized for deployment
 
-### ✅ Developer Experience
+## 🛠️ Tech Stack
 
--   **ESLint + TypeScript** configuration
--   **GitHub Actions** CI/CD setup
--   **Component library** with consistent styling
--   **Error and loading states** throughout
--   **Form validation** with proper UX patterns
+-   **Framework**: Next.js 14 (App Router)
+-   **Language**: TypeScript
+-   **Styling**: Tailwind CSS + shadcn/ui
+-   **Database**: PostgreSQL (Vercel Postgres/Local)
+-   **ORM**: Drizzle ORM
+-   **Authentication**: Better Auth
+-   **Payments**: Stripe
+-   **Validation**: Zod
+-   **Icons**: Lucide React
+-   **Deployment**: Vercel (recommended)
 
-## 🔧 Tech Stack
+## 📦 Getting Started
 
--   **Framework:** Next.js 14 (App Router)
--   **Language:** TypeScript
--   **Styling:** TailwindCSS + shadcn/ui
--   **Icons:** Lucide React
--   **Forms:** React Hook Form + Zod validation
--   **Analytics:** Vercel Analytics
--   **Fonts:** Geist Sans/Mono
+### Prerequisites
 
-## 🚀 Quick Start
+-   Node.js 18+ and npm/pnpm
+-   PostgreSQL database
+-   Stripe account (for payments)
+
+### 1. Clone and Install
 
 ```bash
-# Install dependencies
+git clone <your-repo-url>
+cd saas-starter-kit
 npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-Visit `http://localhost:3000` to see the application.
+### 2. Environment Setup
 
-## 📱 Pages & Features
+Copy the environment template:
 
-### Authentication Flow
+```bash
+cp .env.example .env.local
+```
 
--   `/auth/signin` - Sign in page
--   `/auth/signup` - Sign up page
--   `/auth/reset-password` - Password reset
+Update `.env.local` with your configuration:
 
-### Dashboard
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/saas_starter_kit"
 
--   `/dashboard` - Main dashboard with analytics
--   `/dashboard/entities` - Entity management (CRUD)
--   `/dashboard/billing` - Billing and subscription management
+# Authentication
+BETTER_AUTH_SECRET="your-super-secret-key-min-32-chars-long"
+BETTER_AUTH_URL="http://localhost:3000"
 
-## 🎯 What's Missing (Recommendations to Add)
+# Stripe (optional for development)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PRO_PRICE_ID="price_..."
+STRIPE_BUSINESS_PRICE_ID="price_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
 
-### 🔴 Critical Missing Features
+# Email (optional)
+SMTP_HOST=""
+SMTP_PORT=""
+SMTP_USER=""
+SMTP_PASSWORD=""
+```
 
-#### **Backend & Database**
+### 3. Database Setup
 
--   **Database integration** (PostgreSQL + Drizzle/Prisma)
--   **Authentication system** BetterAuth
--   **API routes** for CRUD operations
--   **User session management**
--   **Password hashing** and security
+Generate and run migrations:
 
-#### **Payment Integration**
+```bash
+npm run db:generate
+npm run db:migrate
+```
 
--   **Stripe integration** for subscriptions
--   **Webhook handling** for payment events
--   **Subscription status management**
--   **Usage tracking** and billing logic
+Optional: Open database studio:
 
-#### **Security & Validation**
+```bash
+npm run db:studio
+```
 
--   **Input validation** (server-side with Zod)
--   **Rate limiting** middleware
--   **CSRF protection**
--   **Environment variables** management
+### 4. Run Development Server
 
-### 🟡 Important Enhancements
+```bash
+npm run dev
+```
 
-#### **Team Management**
+Visit [http://localhost:3000](http://localhost:3000) to see your application.
 
--   **Multi-tenant support** (organizations)
--   **Team member invitations** via email
--   **Role-based permissions** (RBAC)
--   **Team settings** and preferences
+## 🗄️ Database Schema
 
-#### **Communication**
+The starter kit includes comprehensive database schema with:
 
--   **Email system** (transactional emails)
--   **In-app notifications** system
--   **Toast notifications** for user feedback
--   **Real-time updates** (websockets)
+-   **Users**: Complete user profiles with preferences
+-   **Sessions**: Secure session management
+-   **Accounts**: OAuth provider support
+-   **Entities**: Business entity management
+-   **Subscriptions**: Stripe subscription tracking
+-   **Plans**: Subscription plan definitions
+-   **Payments**: Payment history and invoices
+-   **Usage**: Resource usage tracking
 
-#### **Analytics & Monitoring**
+## 💳 Stripe Integration
 
--   **User activity tracking**
--   **Application metrics** dashboard
--   **Error tracking** (Sentry integration)
--   **Performance monitoring**
+### Quick Setup
 
-### 🟢 Nice-to-Have Features
+1. Create a Stripe account and get your API keys
+2. Create products and prices in Stripe Dashboard
+3. Configure webhooks for subscription events
+4. Update environment variables
 
-#### **Advanced Functionality**
+For detailed setup instructions, see [STRIPE_SETUP.md](./STRIPE_SETUP.md).
 
--   **File upload** and storage (S3/Cloudinary)
--   **Search functionality** (full-text search)
--   **Data export** capabilities
--   **API documentation** (Swagger/OpenAPI)
+### Subscription Plans
 
-#### **User Experience**
+-   **Free**: 1 user, 100 API calls/month, 1GB storage
+-   **Pro**: 5 users, 10K API calls/month, 10GB storage ($19/month)
+-   **Business**: Unlimited users/API calls, 100GB storage ($49/month)
 
--   **Onboarding flow** for new users
--   **Help system** and documentation
--   **Keyboard shortcuts**
--   **Internationalization** (i18n) support
+## 🎨 UI Components
 
-#### **DevOps & Infrastructure**
+Built with shadcn/ui components:
 
--   **Docker configuration**
--   **Database migrations** system
--   **Backup and recovery** procedures
--   **Monitoring and alerting**
+-   Modern, accessible component library
+-   Dark/light mode support
+-   Fully customizable with Tailwind CSS
+-   Mobile-responsive design
+-   Loading states and error handling
 
-## 🛠 Recommended Implementation Priority
+## 🔐 Authentication
 
-### Phase 1: Core Backend (Essential)
+Powered by Better Auth:
 
-1. **Database setup** (PostgreSQL + ORM)
-2. **Authentication system** (NextAuth.js)
-3. **API routes** for existing UI
-4. **Environment configuration**
+-   Email/password authentication
+-   Session management
+-   Password reset functionality
+-   OAuth providers ready (GitHub, Google, etc.)
+-   CSRF protection and security headers
 
-### Phase 2: Payments & Security
+## 📁 Project Structure
 
-1. **Stripe integration**
-2. **Subscription management**
-3. **Input validation**
-4. **Rate limiting**
+```
+src/
+├── app/
+│   ├── api/           # API routes
+│   ├── auth/          # Authentication pages
+│   ├── dashboard/     # Protected dashboard pages
+│   └── page.tsx       # Landing page
+├── components/
+│   ├── ui/            # shadcn/ui components
+│   ├── auth/          # Authentication components
+│   └── dashboard/     # Dashboard components
+├── lib/
+│   ├── db/            # Database schema and config
+│   ├── auth.ts        # Authentication config
+│   ├── stripe.ts      # Stripe configuration
+│   └── utils.ts       # Utility functions
+└── hooks/             # Custom React hooks
+```
 
-### Phase 3: Team Features
+## 🚀 Deployment
 
-1. **Multi-tenant architecture**
-2. **Team invitations**
-3. **Role-based access**
-4. **Email system**
+### Vercel (Recommended)
 
-### Phase 4: Analytics & Polish
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Configure environment variables
+4. Deploy with automatic PostgreSQL setup
 
-1. **User tracking**
-2. **Notifications system**
-3. **File uploads**
-4. **Performance optimization**
+### Manual Deployment
 
-## 💡 Key Strengths
+1. Build the application: `npm run build`
+2. Set up PostgreSQL database
+3. Configure environment variables
+4. Deploy to your hosting platform
 
--   **Modern UI/UX** with professional design
--   **Type-safe** development environment
--   **Comprehensive component library**
--   **Mobile-responsive** design
--   **Dark mode** support
--   **Excellent developer experience**
+## 🔧 Development
 
-## 🎯 Ideal For
+### Available Scripts
 
--   **SaaS MVPs** requiring rapid development
--   **B2B applications** with team management needs
--   **Subscription-based** services
--   **Developer tools** and platforms
--   **Professional dashboards** and admin panels
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run db:generate  # Generate database migrations
+npm run db:migrate   # Run database migrations
+npm run db:studio    # Open Drizzle Studio
+```
 
-This starter kit provides an excellent foundation for any SaaS application. The UI is production-ready, and adding the backend features will create a complete, scalable SaaS platform.
+### Code Quality
+
+-   TypeScript for type safety
+-   ESLint for code linting
+-   Prettier formatting (recommended)
+-   Zod for runtime validation
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
+
+## 🆘 Support
+
+-   📖 [Documentation](./DOCS.md)
+-   💳 [Stripe Setup Guide](./STRIPE_SETUP.md)
+-   🐛 [Report Issues](https://github.com/your-username/saas-starter-kit/issues)
+-   💬 [Discussions](https://github.com/your-username/saas-starter-kit/discussions)
+
+## 🙏 Acknowledgments
+
+Built with amazing open-source tools:
+
+-   [Next.js](https://nextjs.org/) - React framework
+-   [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+-   [shadcn/ui](https://ui.shadcn.com/) - Component library
+-   [Drizzle ORM](https://orm.drizzle.team/) - Type-safe ORM
+-   [Better Auth](https://www.better-auth.com/) - Authentication library
+-   [Stripe](https://stripe.com/) - Payment processing
+
+---
+
+**Ready to build your SaaS? Star this repo and get started!** ⭐
